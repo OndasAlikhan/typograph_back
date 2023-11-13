@@ -38,4 +38,7 @@ func RegisterRoute(urlPrefix string) {
 	routeGroup.GET("/permissions/:id", permissionController.Show, authM.Run(), permissionM.Run("permissions-show"))
 	routeGroup.PATCH("/permissions/:id", permissionController.Update, authM.Run(), permissionM.Run("permissions-update"))
 	routeGroup.DELETE("/permissions/:id", permissionController.Delete, authM.Run(), permissionM.Run("permissions-delete"))
+
+	paragraphContoller := controller.NewParagraphController()
+	routeGroup.GET("/random_paragraph", paragraphContoller.GetRandom)
 }

@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"typograph_back/src/application"
 	"typograph_back/src/model"
 
@@ -12,6 +13,21 @@ func RunFixtures() {
 	runRoles()
 	runPermissions()
 	assignPermissionsToAdmin()
+	runParagraphs()
+}
+
+func runParagraphs() {
+	fmt.Println("Starting runParahraphs")
+	var count int64
+	application.GlobalDB.Model(&model.Paragraph{}).Count(&count)
+
+	fmt.Println("count", count)
+	if count > 0 {
+		fmt.Println("if count > 0")
+		return
+	}
+
+	application.GlobalDB.Create(&Quotes)
 }
 
 func runRoles() {

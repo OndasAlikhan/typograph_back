@@ -45,6 +45,7 @@ func InitializeDB(lvl logger.LogLevel) {
 			model.User{},
 			model.Role{},
 			model.Permission{},
+			model.Paragraph{},
 		)
 		if err != nil {
 			log.Fatalf("Migration error: %v", err)
