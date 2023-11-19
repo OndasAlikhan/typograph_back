@@ -14,10 +14,10 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// @title Auth service
+// @title Typograph Backend
 // @version 1.0
-// @description Auth service docs
-// @host localhost:8081
+// @description Backend for speedtyping service
+// @host localhost:8080
 // @BasePath /api/v1
 // @SecurityDefinitions.apiKey ApiKeyAuth
 // @in header

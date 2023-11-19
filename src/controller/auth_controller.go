@@ -30,18 +30,18 @@ func NewAuthController() *AuthController {
 // @param loginRequest body dto.LoginRequest true "Login Request"
 // @success	200 {object} dto.JSONResult{data=dto.LoginResponse}
 // @router /login [post]
-func (this *AuthController) Login(c echo.Context) error {
+func (ac *AuthController) Login(c echo.Context) error {
 	request := dto.LoginRequest{}
-	if err := this.handleRequest(&request, c); err != nil {
+	if err := ac.handleRequest(&request, c); err != nil {
 		return err
 	}
 
-	token, err := this.service.Login(&request)
+	token, err := ac.service.Login(&request)
 	if err != nil {
 		return err
 	}
 
-	return this.json(http.StatusOK, dto.NewLoginResponse(token), c)
+	return ac.json(http.StatusOK, dto.NewLoginResponse(token), c)
 }
 
 // Me
@@ -53,11 +53,11 @@ func (this *AuthController) Login(c echo.Context) error {
 // @tags auth
 // @success 200	{object} dto.JSONResult{data=dto.UserResponse}
 // @router /me [get]
-func (this *AuthController) Me(c echo.Context) error {
-	user, err := this.authUser(c)
+func (ac *AuthController) Me(c echo.Context) error {
+	user, err := ac.authUser(c)
 	if err != nil {
 		return err
 	}
 
-	return this.json(http.StatusOK, dto.NewUserResponse(user), c)
+	return ac.json(http.StatusOK, dto.NewUserResponse(user), c)
 }

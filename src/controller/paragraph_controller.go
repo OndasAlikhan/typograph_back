@@ -21,13 +21,22 @@ func NewParagraphController() *ParagraphController {
 	}
 }
 
-func (this *ParagraphController) GetRandom(c echo.Context) error {
-	paragraph, err := this.service.GetRandom()
+// GetRandom
+// @title GetRandom
+// @description Get random quote
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags auth
+// @success 200	{object} dto.JSONResult{data=dto.ParagraphResponse}
+// @router /get_random [get]
+func (pc *ParagraphController) GetRandom(c echo.Context) error {
+	paragraph, err := pc.service.GetRandom()
 	if err != nil {
 		return err
 	}
 
 	response := dto.NewParagraphResponse(paragraph)
 
-	return this.json(http.StatusOK, response, c)
+	return pc.json(http.StatusOK, response, c)
 }
