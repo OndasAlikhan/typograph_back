@@ -17,22 +17,22 @@ func NewPermissionService() *PermissionService {
 	return &PermissionService{repository: repository.NewPermissionRepository()}
 }
 
-func (this *PermissionService) GetAllByRole(roleID uint) ([]*model.Permission, error) {
-	return this.repository.GetAllByRole(roleID)
+func (ps *PermissionService) GetAllByRole(roleID uint) ([]*model.Permission, error) {
+	return ps.repository.GetAllByRole(roleID)
 }
 
-func (this *PermissionService) GetById(id uint) (*model.Permission, error) {
-	return this.repository.GetById(id)
+func (ps *PermissionService) GetById(id uint) (*model.Permission, error) {
+	return ps.repository.GetById(id)
 }
 
-func (this *PermissionService) Create(request *dto.PermissionStoreRequest) (*model.Permission, error) {
+func (ps *PermissionService) Create(request *dto.PermissionStoreRequest) (*model.Permission, error) {
 	permission := model.Permission{Name: request.Name, Slug: slug.Make(request.Name)}
 
-	return this.repository.Save(permission)
+	return ps.repository.Save(permission)
 }
 
-func (this *PermissionService) Update(id uint, request *dto.PermissionUpdateRequest) (*model.Permission, error) {
-	permission, err := this.repository.GetById(id)
+func (ps *PermissionService) Update(id uint, request *dto.PermissionUpdateRequest) (*model.Permission, error) {
+	permission, err := ps.repository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +40,9 @@ func (this *PermissionService) Update(id uint, request *dto.PermissionUpdateRequ
 	permission.Name = request.Name
 	permission.Slug = slug.Make(request.Name)
 
-	return this.repository.Save(*permission)
+	return ps.repository.Save(*permission)
 }
 
-func (this *PermissionService) Delete(id uint) error {
-	return this.repository.Delete(id)
+func (ps *PermissionService) Delete(id uint) error {
+	return ps.repository.Delete(id)
 }

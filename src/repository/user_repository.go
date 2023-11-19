@@ -29,6 +29,13 @@ func (this *UserRepository) GetById(id uint) (*model.User, error) {
 	return user, err
 }
 
+func (this *UserRepository) GetByIds(ids []uint) ([]*model.User, error) {
+	var users []*model.User
+	err := this.connection.Where("id IN ?", ids).Find(&users).Error
+
+	return users, err
+}
+
 func (this *UserRepository) GetByEmail(email string) (*model.User, error) {
 	var user *model.User
 	err := this.connection.Where("email = ?", email).First(&user).Error

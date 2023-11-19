@@ -14,6 +14,6 @@ func NewParagraphService() *ParagraphService {
 	return &ParagraphService{repository: repository.NewParagraphRepository()}
 }
 
-func (this *ParagraphService) GetRandom() (*model.Paragraph, error) {
-	return this.repository.GetRandom()
+func (ps *ParagraphService) GetRandom() (*model.Paragraph, error) {
+	return ps.repository.GetRandom()
 }

@@ -8,6 +8,7 @@ import (
 type UserServiceInterface interface {
 	GetAll() ([]*model.User, error)
 	GetById(id uint) (*model.User, error)
+	GetByIds(ids []uint) ([]*model.User, error)
 	GetByEmail(email string) (*model.User, error)
 	Create(request *dto.UserStoreRequest) (*model.User, error)
 	UpdatePassword(id uint, request *dto.UserUpdatePasswordRequest) (*model.User, error)

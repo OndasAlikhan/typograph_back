@@ -21,8 +21,8 @@ func NewAuthService() *AuthService {
 	}
 }
 
-func (this *AuthService) Login(request *dto.LoginRequest) (string, error) {
-	user, err := this.userService.GetByEmail(request.Email)
+func (as *AuthService) Login(request *dto.LoginRequest) (string, error) {
+	user, err := as.userService.GetByEmail(request.Email)
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return "", exception.ErrInvalidLogin
@@ -30,11 +30,11 @@ func (this *AuthService) Login(request *dto.LoginRequest) (string, error) {
 		return "", err
 	}
 
-	if !this.jwtService.IsEqual(user.Password, request.Password) {
+	if !as.jwtService.IsEqual(user.Password, request.Password) {
 		return "", exception.ErrInvalidLogin
 	}
 
-	token, err := this.jwtService.GenerateToken(user.ID)
+	token, err := as.jwtService.GenerateToken(user.ID)
 	if err != nil {
 		return "", err
 	}

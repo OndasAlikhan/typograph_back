@@ -17,26 +17,26 @@ func NewRoleService() *RoleService {
 	return &RoleService{repository: repository.NewRoleRepository()}
 }
 
-func (this *RoleService) GetAll() ([]*model.Role, error) {
-	return this.repository.GetAll()
+func (rs *RoleService) GetAll() ([]*model.Role, error) {
+	return rs.repository.GetAll()
 }
 
-func (this *RoleService) GetById(id uint) (*model.Role, error) {
-	return this.repository.GetById(id)
+func (rs *RoleService) GetById(id uint) (*model.Role, error) {
+	return rs.repository.GetById(id)
 }
 
-func (this *RoleService) GetBySlug(slug string) (*model.Role, error) {
-	return this.repository.GetBySlug(slug)
+func (rs *RoleService) GetBySlug(slug string) (*model.Role, error) {
+	return rs.repository.GetBySlug(slug)
 }
 
-func (this *RoleService) Create(request *dto.RoleStoreRequest) (*model.Role, error) {
+func (rs *RoleService) Create(request *dto.RoleStoreRequest) (*model.Role, error) {
 	role := model.Role{Name: request.Name, Slug: slug.Make(request.Name)}
 
-	return this.repository.Save(role)
+	return rs.repository.Save(role)
 }
 
-func (this *RoleService) Update(id uint, request *dto.RoleUpdateRequest) (*model.Role, error) {
-	role, err := this.repository.GetById(id)
+func (rs *RoleService) Update(id uint, request *dto.RoleUpdateRequest) (*model.Role, error) {
+	role, err := rs.repository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -44,17 +44,17 @@ func (this *RoleService) Update(id uint, request *dto.RoleUpdateRequest) (*model
 	role.Name = request.Name
 	role.Slug = slug.Make(request.Name)
 
-	return this.repository.Save(*role)
+	return rs.repository.Save(*role)
 }
 
-func (this *RoleService) Delete(id uint) error {
-	return this.repository.Delete(id)
+func (rs *RoleService) Delete(id uint) error {
+	return rs.repository.Delete(id)
 }
 
-func (this *RoleService) AddPermissions(id uint, request *dto.RoleAddPermissionsRequest) error {
-	return this.repository.AddPermissions(id, request.PermissionsID)
+func (rs *RoleService) AddPermissions(id uint, request *dto.RoleAddPermissionsRequest) error {
+	return rs.repository.AddPermissions(id, request.PermissionsID)
 }
 
-func (this *RoleService) RemovePermissions(id uint, request *dto.RoleRemovePermissionsRequest) error {
-	return this.repository.RemovePermissions(id, request.PermissionsID)
+func (rs *RoleService) RemovePermissions(id uint, request *dto.RoleRemovePermissionsRequest) error {
+	return rs.repository.RemovePermissions(id, request.PermissionsID)
 }

@@ -8,5 +8,7 @@ type User struct {
 	Name     string `gorm:"not null;size:125"`
 	Password string `gorm:"not null"`
 	RoleID   uint
-	Role     *Role `gorm:"foreignKey:RoleID"`
+	Role     *Role   `gorm:"foreignKey:RoleID"`
+	IsAnon   bool    `gorm:"default:false"`
+	Races    []*Race `gorm:"many2many:race_users;"`
 }
