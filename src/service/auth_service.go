@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"typograph_back/src/dto"
 	"typograph_back/src/exception"
 	"typograph_back/src/service/service_interface"
@@ -38,6 +39,27 @@ func (as *AuthService) Login(request *dto.LoginRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	return token, nil
+}
+
+func (as *AuthService) Register(request *dto.RegisterRequest) (string, error) {
+	const op = "auth_service.Register"
+
+	if request.Password != request.PasswordRepeat {
+		return "", fmt.Errorf("%s: passwords don't match", op)
+	}
+
+	user, err := as.userService.Create(&dto.UserStoreRequest{
+		Email:    request.Email,
+		Name:     request.Name,
+		Password: request.Password,
+	})
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	token, err := as.jwtService.GenerateToken(user.ID)
 
 	return token, nil
 }

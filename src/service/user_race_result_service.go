@@ -4,7 +4,10 @@ import (
 	"typograph_back/src/dto"
 	"typograph_back/src/model"
 	"typograph_back/src/repository"
+	"typograph_back/src/service/service_interface"
 )
+
+var _ service_interface.UserRaceResultServiceInterface = (*UserRaceResultService)(nil)
 
 type UserRaceResultService struct {
 	repository repository.UserRaceResultRepository
@@ -12,6 +15,10 @@ type UserRaceResultService struct {
 
 func NewUserRaceResultService() *UserRaceResultService {
 	return &UserRaceResultService{repository: *repository.NewUserRaceResulRepository()}
+}
+
+func (us *UserRaceResultService) GetById(id uint) (*model.UserRaceResult, error) {
+	return us.repository.GetById(id)
 }
 
 func (us *UserRaceResultService) Create(request *dto.UserRaceResultCreateRequest) (*model.UserRaceResult, error) {

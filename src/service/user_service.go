@@ -33,6 +33,7 @@ func (us *UserService) GetById(id uint) (*model.User, error) {
 func (us *UserService) GetByIds(ids []uint) ([]*model.User, error) {
 	return us.repository.GetByIds(ids)
 }
+
 func (us *UserService) GetByEmail(email string) (*model.User, error) {
 	return us.repository.GetByEmail(email)
 }

@@ -27,11 +27,22 @@ func (rs *RaceService) GetById(id uint) (*model.Race, error) {
 	return rs.repository.GetById(id)
 }
 
+func (rs *RaceService) GetByIds(ids []uint) ([]*model.Race, error) {
+	return rs.repository.GetByIds(ids)
+}
+
 func (rs *RaceService) Create(request *dto.RaceCreateRequest) (*model.Race, error) {
+	users, err := rs.userService.GetByIds(request.Users)
+	if err != nil {
+		return nil, err
+	}
+
 	race := model.Race{
 		Finished:    request.Finished,
 		AdminUserID: request.AdminUserID,
 		ParagraphID: request.ParagraphID,
+		LobbyID:     request.LobbyID,
+		Users:       users,
 	}
 	result, _, err := rs.repository.Save(race)
 
@@ -47,18 +58,21 @@ func (rs *RaceService) Update(id uint, request *dto.RaceUpdateRequest) (*model.R
 	race.Finished = request.Finished
 	race.AdminUserID = request.AdminUserID
 	race.ParagraphID = request.ParagraphID
+	race.LobbyID = request.LobbyID
 
-	result, db, err := rs.repository.Save(*race)
+	result, tx, err := rs.repository.Save(*race)
 	if request.Users != nil {
 		users, err := rs.userService.GetByIds(request.Users)
 		if err != nil {
 			return nil, err
 		}
 
-		db.Association("Users").Replace(users)
+		updateUserErr := rs.repository.UpdateUsers(users, tx)
+		if updateUserErr != nil {
+			return nil, updateUserErr
+		}
 	}
-
-	return result, err
+	return result, nil
 }
 
 func (rs *RaceService) Delete(id uint) error {

@@ -3,9 +3,12 @@ package repository
 import (
 	"typograph_back/src/application"
 	"typograph_back/src/model"
+	"typograph_back/src/repository/repository_interface"
 
 	"gorm.io/gorm"
 )
+
+var _ repository_interface.UserRepositoryInterface = (*UserRepository)(nil)
 
 type UserRepository struct {
 	connection *gorm.DB

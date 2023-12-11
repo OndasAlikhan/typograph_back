@@ -44,6 +44,29 @@ func (ac *AuthController) Login(c echo.Context) error {
 	return ac.json(http.StatusOK, dto.NewLoginResponse(token), c)
 }
 
+// Register
+// @title Register
+// @description Register a user
+// @accept json
+// @produce json
+// @tags auth
+// @param registerRequest body dto.RegisterRequest true "Register Request"
+// @success	200 {object} dto.JSONResult{data=dto.RegisterResponse}
+// @router /register [post]
+func (ac *AuthController) Register(c echo.Context) error {
+	request := dto.RegisterRequest{}
+	if err := ac.handleRequest(&request, c); err != nil {
+		return err
+	}
+
+	token, err := ac.service.Register(&request)
+	if err != nil {
+		return err
+	}
+
+	return ac.json(http.StatusOK, dto.NewRegisterResponse(token), c)
+}
+
 // Me
 // @title Me
 // @description	Get user info

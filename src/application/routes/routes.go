@@ -14,6 +14,7 @@ func RegisterRoute(urlPrefix string) {
 
 	authController := controller.NewAuthController()
 	routeGroup.POST("/login", authController.Login)
+	routeGroup.POST("/register", authController.Register)
 	routeGroup.GET("/me", authController.Me, authM.Run())
 
 	userController := controller.NewUserController()
@@ -41,4 +42,19 @@ func RegisterRoute(urlPrefix string) {
 
 	paragraphContoller := controller.NewParagraphController()
 	routeGroup.GET("/random_paragraph", paragraphContoller.GetRandom)
+
+	raceController := controller.NewRaceController()
+	routeGroup.GET("/races", raceController.Index, authM.Run())
+	routeGroup.GET("/races/:id", raceController.Show, authM.Run())
+	routeGroup.POST("/races", raceController.Store, authM.Run())
+	routeGroup.PATCH("/races", raceController.Update, authM.Run())
+	routeGroup.DELETE("/races", raceController.Delete, authM.Run())
+
+	lobbyController := controller.NewLobbyController()
+	routeGroup.GET("/lobbies", lobbyController.Index, authM.Run())
+	routeGroup.GET("/lobbies/:id", lobbyController.Show, authM.Run())
+	routeGroup.POST("/lobbies", lobbyController.Store, authM.Run())
+	routeGroup.PATCH("/lobbies", lobbyController.Update, authM.Run())
+	routeGroup.DELETE("/lobbies", lobbyController.Delete, authM.Run())
+
 }

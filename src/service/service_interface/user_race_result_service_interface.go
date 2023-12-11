@@ -7,7 +7,7 @@ import (
 
 type UserRaceResultServiceInterface interface {
 	GetById(id uint) (*model.UserRaceResult, error)
-	Create(request dto.UserRaceResultCreateRequest) (*model.UserRaceResult, error)
-	Update(id uint, request dto.UserRaceResultUpdateRequest) (*model.UserRaceResult, error)
+	Create(request *dto.UserRaceResultCreateRequest) (*model.UserRaceResult, error)
+	Update(id uint, request *dto.UserRaceResultUpdateRequest) (*model.UserRaceResult, error)
 	Delete(id uint) error
 }

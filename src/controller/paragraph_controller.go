@@ -27,9 +27,9 @@ func NewParagraphController() *ParagraphController {
 // @accept json
 // @produce json
 // @security ApiKeyAuth
-// @tags auth
+// @tags paragraph
 // @success 200	{object} dto.JSONResult{data=dto.ParagraphResponse}
-// @router /get_random [get]
+// @router /random_paragraph [get]
 func (pc *ParagraphController) GetRandom(c echo.Context) error {
 	paragraph, err := pc.service.GetRandom()
 	if err != nil {

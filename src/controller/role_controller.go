@@ -101,7 +101,7 @@ func (this *RoleController) Show(c echo.Context) error {
 // @tags role
 // @param roleUpdateRequest body dto.RoleUpdateRequest true "Role update request"
 // @param id path int true "Role ID"
-// @success 200 {object} dto.JSONResult{data=dto.PermissionResponse}
+// @success 200 {object} dto.JSONResult{data=dto.RoleResponse}
 // @router /roles/{id} [patch]
 func (this *RoleController) Update(c echo.Context) error {
 	id, err := this.parseToUint(c.Param("id"))
