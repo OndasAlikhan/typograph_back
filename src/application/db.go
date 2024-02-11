@@ -19,8 +19,9 @@ var (
 
 func InitializeDB(lvl logger.LogLevel) {
 	onceDB.Do(func() {
-		dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s",
+		dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 			os.Getenv("DB_HOST"),
+			os.Getenv("DB_PORT"),
 			os.Getenv("DB_USER"),
 			os.Getenv("DB_NAME"),
 			os.Getenv("DB_PASSWORD"))

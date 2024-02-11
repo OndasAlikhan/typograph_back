@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"typograph_back/src/dto"
 	"typograph_back/src/service"
 	"typograph_back/src/service/service_interface"
+
+	"github.com/labstack/echo/v4"
 )
 
 type LobbyController struct {
@@ -58,7 +59,9 @@ func (rc *LobbyController) Show(c echo.Context) error {
 		return err
 	}
 	lobby, err := rc.service.GetById(id)
-
+	if err != nil {
+		return err
+	}
 	return rc.json(http.StatusOK, dto.NewLobbyResponse(lobby), c)
 }
 

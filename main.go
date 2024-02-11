@@ -8,7 +8,6 @@ import (
 	"typograph_back/src/application/database"
 	"typograph_back/src/application/routes"
 
-	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"gorm.io/gorm/logger"
@@ -23,9 +22,9 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Env exception: %v", err)
-	}
+	// if err := godotenv.Load(); err != nil {
+	// 	log.Fatalf("Env exception: %v", err)
+	// }
 
 	application.InitializeApp(log.DEBUG)
 	application.InitializeDB(logger.Info)

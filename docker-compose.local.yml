@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  typograph_back:
+    container_name: typograph_back
+    build: ./
+    ports:
+      - "${TYPOGRAPH_SERVICE_PORT}:8080"
+    volumes:
+      - ./:/usr/src/app
+    command: air ./cmd/main.go -b 0.0.0.0
+
+  typograph-db:
+    container_name: typograph-db
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "${TYPOGRAPH_SERVICE_DB_PORT}:5432"
+    volumes:
+      - typograph-db:/var/lib/postgresql/data
+
+volumes:
+  typograph-db:
