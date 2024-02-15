@@ -1,6 +1,16 @@
 version: '3.8'
 
 services:
+  nginx:
+    container_name: tp_nginx
+    build: 
+      context: .
+      dockerfile: ./nginx.dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - typograph_back
+
   typograph_back:
     container_name: typograph_back
     build: ./
@@ -8,6 +18,8 @@ services:
       - "${TYPOGRAPH_SERVICE_PORT}:8080"
     volumes:
       - ./:/usr/src/app
+    depends_on:
+      - typograph-db
     env_file:
       - .env
 

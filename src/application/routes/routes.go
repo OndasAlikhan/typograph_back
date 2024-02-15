@@ -57,6 +57,6 @@ func RegisterRoute(urlPrefix string) {
 	routeGroup.PATCH("/lobbies", lobbyController.Update, authM.Run())
 	routeGroup.DELETE("/lobbies", lobbyController.Delete, authM.Run())
 
-	lobbyWSController := controller.NewLobbyWSController()
-	routeGroup.POST("/ws", lobbyWSController.Index)
+	// lobbyWSController := controller.NewLobbyWSController()
+	// routeGroup.POST("/ws", lobbyWSController.Index)
 }
