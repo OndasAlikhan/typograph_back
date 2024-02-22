@@ -3,4 +3,4 @@ To create swagger:
 ```swag init```
 
 To deploy on server:
-docker --context tp_remote compose up -d
+docker --context tp_remote compose -f docker-compose.prod.yml up -d
