@@ -684,6 +684,99 @@ const docTemplate = `{
                 }
             }
         },
+        "/races/get_user_race_result/:user_id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a list of result by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "race"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.UserRaceResultResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/races/leaderboard": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a list of the best wpm results",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "race"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.UserRaceResultResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/races/{id}": {
             "get": {
                 "security": [
@@ -1807,17 +1900,16 @@ const docTemplate = `{
             "required": [
                 "accuracy",
                 "duration",
-                "race_id",
                 "user_id",
                 "wpm"
             ],
             "properties": {
                 "accuracy": {
-                    "type": "integer",
+                    "type": "number",
                     "maximum": 100
                 },
                 "duration": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "race_id": {
                     "type": "integer"
@@ -1826,7 +1918,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "wpm": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1834,10 +1926,13 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "accuracy": {
-                    "type": "integer"
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
                 },
                 "duration": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "id": {
                     "type": "integer"
@@ -1849,7 +1944,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "wpm": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },

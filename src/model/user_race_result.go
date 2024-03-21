@@ -4,11 +4,11 @@ import "gorm.io/gorm"
 
 type UserRaceResult struct {
 	gorm.Model
-	Duration uint  `gorm:"default:0"` //seconds
-	WPM      uint  `gorm:"default:0"`
-	Accuracy uint8 `gorm:"default:0"` //percents
+	Duration float32 `gorm:"default:0"` //seconds
+	WPM      float32 `gorm:"default:0"`
+	Accuracy float32 `gorm:"default:0"` //percents
 	UserID   uint
 	User     *User `gorm:"foreign:UserID"`
-	RaceID   uint
+	RaceID   uint  `gorm:"default:null"`
 	Race     *Race `gorm:"foreign:RaceID"`
 }

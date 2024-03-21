@@ -253,28 +253,29 @@ definitions:
     properties:
       accuracy:
         maximum: 100
-        type: integer
+        type: number
       duration:
-        type: integer
+        type: number
       race_id:
         type: integer
       user_id:
         type: integer
       wpm:
-        type: integer
+        type: number
     required:
     - accuracy
     - duration
-    - race_id
     - user_id
     - wpm
     type: object
   dto.UserRaceResultResponse:
     properties:
       accuracy:
-        type: integer
+        type: number
+      created_at:
+        type: string
       duration:
-        type: integer
+        type: number
       id:
         type: integer
       race_id:
@@ -282,7 +283,7 @@ definitions:
       user_id:
         type: integer
       wpm:
-        type: integer
+        type: number
     type: object
   dto.UserResponse:
     properties:
@@ -774,6 +775,58 @@ paths:
             - properties:
                 data:
                   $ref: '#/definitions/dto.UserRaceResultResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - race
+  /races/get_user_race_result/:user_id:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of result by user id
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.JSONResult'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserRaceResultResponse'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - race
+  /races/leaderboard:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of the best wpm results
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.JSONResult'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserRaceResultResponse'
+                  type: array
               type: object
       security:
       - ApiKeyAuth: []

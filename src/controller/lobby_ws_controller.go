@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
-	"typograph_back/src/dto"
+
+	"typograph_back/src/service"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -11,46 +13,51 @@ import (
 var upgrader = websocket.Upgrader{}
 
 const (
-	connectionMsg      = "CONNECTION"
-	enterLobbyMsg      = "ENTER_LOBBY"
-	broadcastInRoomMsg = "BROADCAST_IN_ROOM"
+	connectionType      = "CONNECTION"
+	enterLobbyType      = "ENTER_LOBBY"
+	broadcastInRoomType = "BROADCAST_IN_ROOM"
 )
 
-type LobbyWSController struct {
-	*BaseController
-	clients   map[uint]*websocket.Conn
-	lobbies   map[uint][]*websocket.Conn
-	broadcast chan interface{}
+type TypeSwitch struct {
+	Type string `json:"type"`
 }
 
-type SocketMessage struct {
-	Type string      `json:"type"`
-	Body interface{} `json:"body"`
+type ConnectionMsg struct {
+	Type   string `json:"type"`
+	UserID uint   `json:"user_id"`
 }
-type ConnectionMsgBody struct {
-	UserID uint `json:"user_id"`
+type EnterLobbyMsg struct {
+	Type    string `json:"type"`
+	UserID  uint   `json:"user_id"`
+	LobbyID uint   `json:"lobby_id"`
 }
-type EnterLobbyMsgBody struct {
-	UserID  uint `json:"user_id"`
-	LobbyID uint `json:"lobby_id"`
-}
-type BroadcastInRoomMsgBody struct {
+type BroadcastInRoomMsg struct {
+	Type    string `json:"type"`
 	LobbyID uint   `json:"lobby_id"`
 	UserID  uint   `json:"user_id"`
 	Text    string `json:"text"`
 }
 
+type LobbyWSController struct {
+	*BaseController
+	clients        map[uint]*websocket.Conn
+	lobbies        map[uint][]*websocket.Conn
+	broadcast      chan interface{}
+	lobbyWsService *service.LobbyWsService
+}
+
 func NewLobbyWSController() *LobbyWSController {
-	lwc := &LobbyWSController{}
-	lwc.handleBroadcast()
+	lwc := &LobbyWSController{lobbyWsService: service.NewLobbyWsService()}
+	// go lwc.handleBroadcast()
 	return lwc
 }
 
 func (lwc LobbyWSController) Index(c echo.Context) error {
-	request := dto.LobbyWSCreateRequest{}
-	if err := lwc.handleRequest(&request, c); err != nil {
-		return err
-	}
+	fmt.Println("Index 1")
+	// request := dto.LobbyWSCreateRequest{}
+	// if err := lwc.handleRequest(&request, c); err != nil {
+	// 	return err
+	// }
 
 	// ping pong
 
@@ -58,9 +65,11 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("Index 2")
+
 	defer conn.Close()
 
-	lwc.clients[request.UserID] = conn
+	// lwc.clients[request.UserID] = conn
 
 	for {
 		// Write
@@ -68,23 +77,18 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 		// if err != nil {
 		// 	c.Logger().Error(err)
 		// }
-
 		// Read
-		var message SocketMessage
-		err := conn.ReadJSON(&message)
+		msgType, p, err := conn.ReadMessage()
+		if msgType != 1 {
+			return err
+		}
 
-		// switch message.Type {
-		// case connectRoom:
-		// 	dataConnect := &DataConnectRoom{}
-
-		// 	// dataConnect = (DataConnectRoom)message.Data
-		// }
-
-		//
+		var typeSwitch TypeSwitch
+		err = json.Unmarshal(p, &typeSwitch)
 
 		if err != nil {
 			c.Logger().Error(err)
-			delete(lwc.clients, request.UserID)
+			// delete(lwc.clients, request.UserID)
 			conn.Close()
 
 			return err
@@ -93,28 +97,35 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 		// Находим юзеров по лоббиИД
 		// рассылаем этим юзерам сообщение
 
-		switch message.Type {
-		case connectionMsg:
-			data, ok := message.Body.(ConnectionMsgBody)
-			if !ok {
+		switch typeSwitch.Type {
+		case connectionType:
+			var connectionMsg ConnectionMsg
+			err := json.Unmarshal(p, &connectionMsg)
+
+			if err != nil {
 				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
 			}
-			fmt.Printf("connection %v", data)
-		case enterLobbyMsg:
-			data, ok := message.Body.(EnterLobbyMsgBody)
-			if !ok {
+
+			lwc.lobbyWsService.AddClient(connectionMsg.UserID, conn)
+		case enterLobbyType:
+			var enterLobbyMsg EnterLobbyMsg
+			err := json.Unmarshal(p, &enterLobbyMsg)
+
+			if err != nil {
 				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
 			}
-			fmt.Printf("enter_lobby %v", data)
-		case broadcastInRoomMsg:
-			data, ok := message.Body.(BroadcastInRoomMsgBody)
-			if !ok {
+			fmt.Printf("connection!!! %v\n", enterLobbyMsg)
+		case broadcastInRoomType:
+			var broadcastInRoomMsg BroadcastInRoomMsg
+			err := json.Unmarshal(p, &broadcastInRoomMsg)
+
+			if err != nil {
 				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
 			}
-			fmt.Printf("broadcast %v", data)
+			fmt.Printf("connection!!! %v\n", broadcastInRoomMsg)
 		}
 
-		fmt.Printf("HERE IS THE MESSAGE %s\n", message)
+		fmt.Printf("HERE IS THE MESSAGE %s\n")
 	}
 }
 

@@ -49,6 +49,9 @@ func RegisterRoute(urlPrefix string) {
 	routeGroup.POST("/races", raceController.Store, authM.Run())
 	routeGroup.PATCH("/races", raceController.Update, authM.Run())
 	routeGroup.DELETE("/races", raceController.Delete, authM.Run())
+	routeGroup.POST("/races/add_user_race_result", raceController.AddUserRaceResult, authM.Run())
+	routeGroup.GET("/races/get_user_race_result/:user_id", raceController.GetUserRaceResults, authM.Run())
+	routeGroup.GET("/races/leaderboard", raceController.Leaderboard)
 
 	lobbyController := controller.NewLobbyController()
 	routeGroup.GET("/lobbies", lobbyController.Index, authM.Run())
@@ -57,6 +60,6 @@ func RegisterRoute(urlPrefix string) {
 	routeGroup.PATCH("/lobbies", lobbyController.Update, authM.Run())
 	routeGroup.DELETE("/lobbies", lobbyController.Delete, authM.Run())
 
-	// lobbyWSController := controller.NewLobbyWSController()
-	// routeGroup.POST("/ws", lobbyWSController.Index)
+	lobbyWSController := controller.NewLobbyWSController()
+	routeGroup.GET("/ws", lobbyWSController.Index)
 }

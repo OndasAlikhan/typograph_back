@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"typograph_back/src/dto"
 	"typograph_back/src/service"
@@ -60,7 +61,7 @@ func (rc *RaceController) Show(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	race, err := rc.service.GetById(id)
+	race, _ := rc.service.GetById(id)
 
 	return rc.json(http.StatusOK, dto.NewRaceResponse(race), c)
 }
@@ -156,10 +157,64 @@ func (rc *RaceController) AddUserRaceResult(c echo.Context) error {
 		return err
 	}
 
+	fmt.Printf("request: %v\n", request)
+
 	result, err := rc.userRaceResultService.Create(&request)
 	if err != nil {
 		return err
 	}
 
 	return rc.json(http.StatusOK, dto.NewUserRaceResultResponse(result), c)
+}
+
+// GetUserRaceResult
+// @title GetUserRaceResult
+// @description Get a list of result by user id
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags race
+// @param user_id path int true "User ID"
+// @success 200 {object} dto.JSONResult{data=[]dto.UserRaceResultResponse}
+// @router /races/get_user_race_result/:user_id [get]
+func (rc *RaceController) GetUserRaceResults(c echo.Context) error {
+	id, err := rc.parseToUint(c.Param("user_id"))
+	if err != nil {
+		return err
+	}
+
+	results, err := rc.userRaceResultService.GetByUserId(id)
+	if err != nil {
+		return err
+	}
+
+	response := make([]*dto.UserRaceResultResponse, len(results))
+	for ind, val := range results {
+		response[ind] = dto.NewUserRaceResultResponse(val)
+	}
+
+	return rc.json(http.StatusOK, response, c)
+}
+
+// Leaderboard
+// @title Leaderboard
+// @description Get a list of the best wpm results
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags race
+// @success 200 {object} dto.JSONResult{data=[]dto.UserRaceResultResponse}
+// @router /races/leaderboard [get]
+func (rc *RaceController) Leaderboard(c echo.Context) error {
+	results, err := rc.userRaceResultService.Leaderboard()
+	if err != nil {
+		return err
+	}
+
+	response := make([]*dto.LeaderboardResponse, len(results))
+	for ind, val := range results {
+		response[ind] = dto.NewLeaderboardResponse(val)
+	}
+
+	return rc.json(http.StatusOK, response, c)
 }

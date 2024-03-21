@@ -21,11 +21,19 @@ func (us *UserRaceResultService) GetById(id uint) (*model.UserRaceResult, error)
 	return us.repository.GetById(id)
 }
 
+func (us *UserRaceResultService) GetByUserId(userId uint) ([]*model.UserRaceResult, error) {
+	return us.repository.GetByUserId(userId)
+}
+
+func (us *UserRaceResultService) Leaderboard() ([]*dto.LeaderboardResponse, error) {
+	return us.repository.Leaderboard()
+}
+
 func (us *UserRaceResultService) Create(request *dto.UserRaceResultCreateRequest) (*model.UserRaceResult, error) {
 	value := model.UserRaceResult{
 		Duration: request.Duration,
 		WPM:      request.WPM,
-		Accuracy: uint8(request.Accuracy),
+		Accuracy: request.Accuracy,
 		UserID:   request.UserID,
 		RaceID:   request.RaceID,
 	}
@@ -42,7 +50,7 @@ func (us *UserRaceResultService) Update(id uint, request *dto.UserRaceResultUpda
 
 	value.Duration = request.Duration
 	value.WPM = request.WPM
-	value.Accuracy = uint8(request.Accuracy)
+	value.Accuracy = request.Accuracy
 	value.UserID = request.UserID
 	value.RaceID = request.RaceID
 
