@@ -2,26 +2,6 @@ version: '3.8'
 name: tp_prod
 
 services:
-  nginx:
-    container_name: tp_nginx
-    build: 
-      context: .
-      dockerfile: ./docker/nginx.dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - typograph_back
-    volumes:
-      - ./certbot/www:/var/www/certbot/:ro
-      - ./certbot/conf/:/etc/nginx/ssl/:ro
-
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
-
   typograph_back:
     container_name: typograph_back
     build: 
