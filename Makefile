@@ -2,13 +2,9 @@ dev:
 	docker compose -f docker-compose.local.yml up
 
 prod:
-	docker compose -f docker-compose.prod.yml up
+	docker compose -f docker-compose.prod.yml down
+	docker compose -f docker-compose.prod.yml up --force-recreate
 
 deploy_prod:
-	docker --context tp_remote compose -f docker-compose.prod.yml up -d
-
-renew_cert:
-	docker --context tp_remote compose -f docker-compose.prod.yml exec nginx certbot renew
-
-generate_cert_on_server:
-	docker --context tp_remote compose -f docker-compose.prod.yml run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d api.typograph.kz   
+	docker --context tp_remote compose -f docker-compose.prod.yml down
+	docker --context tp_remote compose -f docker-compose.prod.yml up -d --force-recreate
