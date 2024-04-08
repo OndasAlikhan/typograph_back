@@ -38,6 +38,7 @@ func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, e
 
 	lobby := model.Lobby{
 		AdminUserID: request.AdminUserID,
+		Status:      "active",
 		Name:        request.Name,
 		Users:       users,
 		Races:       races,
@@ -59,6 +60,7 @@ func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model
 
 	lobby.Name = request.Name
 	lobby.AdminUserID = request.AdminUserID
+	lobby.Status = request.Status
 
 	result, tx, err := ls.repository.Save(*lobby)
 	if err != nil {
