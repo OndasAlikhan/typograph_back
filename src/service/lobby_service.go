@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"typograph_back/src/dto"
 	"typograph_back/src/model"
 	"typograph_back/src/repository"
@@ -11,9 +12,10 @@ import (
 var _ service_interface.LobbyServiceInterface = (*LobbyService)(nil)
 
 type LobbyService struct {
-	repository  repository_interface.LobbyRepositoryInterface
-	userService service_interface.UserServiceInterface
-	raceService service_interface.RaceServiceInterface
+	repository     repository_interface.LobbyRepositoryInterface
+	userService    service_interface.UserServiceInterface
+	raceService    service_interface.RaceServiceInterface
+	lobbyWsService LobbyWsService
 }
 
 func NewLobbyService() *LobbyService {
@@ -25,7 +27,8 @@ func (ls *LobbyService) GetAll() ([]*model.Lobby, error) {
 }
 
 func (ls *LobbyService) GetById(id uint) (*model.Lobby, error) {
-	return ls.repository.GetById(id)
+	lobby, _, err := ls.repository.GetById(id)
+	return lobby, err
 }
 
 func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, error) {
@@ -52,8 +55,47 @@ func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, e
 	return value, err
 }
 
+func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
+	lobby, tx, err := ls.repository.GetById(lobbyId)
+	if err != nil {
+		return err
+	}
+
+	newUser, err := ls.userService.GetById(userId)
+	if err != nil {
+		return fmt.Errorf("user with id %d not found: %s", userId, err)
+	}
+
+	lobbyUsers := append(lobby.Users, newUser)
+
+	updateErr := ls.repository.UpdateUsers(lobbyUsers, tx)
+	if updateErr != nil {
+		return updateErr
+	}
+	return nil
+}
+
+func (ls *LobbyService) LeaveLobby(lobbyId uint, userId uint) error {
+	lobby, tx, err := ls.repository.GetById(lobbyId)
+	if err != nil {
+		return err
+	}
+
+	updatedUsers := make([]*model.User, 0)
+	for _, user := range lobby.Users {
+		if user.ID != userId {
+			updatedUsers = append(updatedUsers, user)
+		}
+	}
+	updateErr := ls.repository.UpdateUsers(updatedUsers, tx)
+	if updateErr != nil {
+		return updateErr
+	}
+	return nil
+}
+
 func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model.Lobby, error) {
-	lobby, err := ls.repository.GetById(id)
+	lobby, _, err := ls.repository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +134,6 @@ func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model
 	}
 
 	return result, nil
-
 }
 
 func (ls *LobbyService) Delete(id uint) error {

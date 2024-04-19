@@ -88,6 +88,32 @@ func (rc *LobbyController) Store(c echo.Context) error {
 	return rc.json(http.StatusOK, dto.NewLobbyResponse(lobby), c)
 }
 
+func (rc *LobbyController) EnterLobby(c echo.Context) error {
+	request := dto.EnterLobbyRequest{}
+	if err := rc.handleRequest(&request, c); err != nil {
+		return err
+	}
+
+	err := rc.service.EnterLobby(request.LobbyID, request.UserID)
+	if err != nil {
+		return err
+	}
+	return rc.json(http.StatusOK, nil, c)
+}
+
+func (rc *LobbyController) LeaveLobby(c echo.Context) error {
+	request := dto.LeaveLobbyRequest{}
+	if err := rc.handleRequest(&request, c); err != nil {
+		return err
+	}
+
+	err := rc.service.LeaveLobby(request.LobbyID, request.UserID)
+	if err != nil {
+		return err
+	}
+	return rc.json(http.StatusOK, nil, c)
+}
+
 // Update
 // @title Update
 // @description Update a lobby

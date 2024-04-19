@@ -16,6 +16,15 @@ type LobbyUpdateRequest struct {
 	Users       []uint `json:"users" validate:"required"`
 	Races       []uint `json:"races"`
 }
+type EnterLobbyRequest struct {
+	LobbyID uint `json:"lobby_id" validate:"required"`
+	UserID  uint `json:"user_id" validate:"required"`
+}
+
+type LeaveLobbyRequest struct {
+	LobbyID uint `json:"lobby_id" validate:"required"`
+	UserID  uint `json:"user_id" validate:"required"`
+}
 
 type LobbyResponse struct {
 	ID          uint            `json:"id"`

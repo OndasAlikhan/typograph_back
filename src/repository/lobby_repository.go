@@ -18,14 +18,13 @@ func NewLobbyRepository() *LobbyRepository {
 	return &LobbyRepository{BaseRepository: NewBaseRepository[model.Lobby]()}
 }
 
-func (lr *LobbyRepository) GetById(id uint) (*model.Lobby, error) {
+func (lr *LobbyRepository) GetById(id uint) (*model.Lobby, *gorm.DB, error) {
 	var value *model.Lobby
-	err := lr.connection.Preload("Users").First(&value, id).Error
-	// err := lr.connection.Joins("join lobby_users on lobby_users.lobby_id = lobbies.id").Joins("join users on users.id = lobby_users.user_id").First(&value, id).Error
+	result := lr.connection.Preload("Users").First(&value, id)
+	err := result.Error
 
 	fmt.Printf("model.Lobby: %v\n", value)
-	return value, err
-
+	return value, result, err
 }
 func (lr *LobbyRepository) Save(lobby model.Lobby) (*model.Lobby, *gorm.DB, error) {
 	result := lr.connection.Save(&lobby)
