@@ -3,7 +3,6 @@ package service
 import (
 	"typograph_back/src/dto"
 	"typograph_back/src/model"
-	"typograph_back/src/repository"
 	"typograph_back/src/repository/repository_interface"
 	"typograph_back/src/service/service_interface"
 )
@@ -15,8 +14,11 @@ type RaceService struct {
 	userService service_interface.UserServiceInterface
 }
 
-func NewRaceService() *RaceService {
-	return &RaceService{repository: repository.NewRaceRepository(), userService: NewUserService()}
+func NewRaceService(
+	repo repository_interface.RaceRepositoryInterface,
+	userService service_interface.UserServiceInterface,
+) *RaceService {
+	return &RaceService{repository: repo, userService: userService}
 }
 
 func (rs *RaceService) GetAll() ([]*model.Race, error) {

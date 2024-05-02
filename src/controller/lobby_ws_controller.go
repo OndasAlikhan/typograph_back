@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"typograph_back/src/dto"
 	"typograph_back/src/service"
@@ -11,7 +12,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 const (
 	connectionType      = "CONNECTION"
@@ -50,20 +55,23 @@ type LobbyWSController struct {
 	lobbyWsService *service.LobbyWsService
 }
 
-func NewLobbyWSController() *LobbyWSController {
-	lwc := &LobbyWSController{lobbyWsService: service.NewLobbyWsService()}
+func NewLobbyWSController(lws *service.LobbyWsService) *LobbyWSController {
+	lwc := &LobbyWSController{lobbyWsService: lws}
 	// go lwc.handleBroadcast()
 	return lwc
 }
 
 func (lwc LobbyWSController) Index(c echo.Context) error {
+	fmt.Printf("----connecting...\n")
 	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
+		fmt.Printf("Failed to set websocket upgrade: %+v\n", err)
 		return err
 	}
 
 	defer conn.Close()
 
+	fmt.Printf("-----BEFORE FOR-----\n")
 	for {
 		msgType, p, err := conn.ReadMessage()
 		if msgType != 1 {
@@ -90,6 +98,10 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 			}
 
 			lwc.lobbyWsService.AddClient(connectionMsg.UserID, conn)
+			conn.SetCloseHandler(func(code int, text string) error {
+				lwc.lobbyWsService.RemoveClient(connectionMsg.UserID)
+				return nil
+			})
 
 		case enterLobbyType:
 			var enterLobbyMsg EnterLobbyMsg

@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"typograph_back/src/dto"
-	"typograph_back/src/service"
 	"typograph_back/src/service/service_interface"
 
 	"github.com/labstack/echo/v4"
@@ -14,10 +13,10 @@ type LobbyController struct {
 	service service_interface.LobbyServiceInterface
 }
 
-func NewLobbyController() *LobbyController {
+func NewLobbyController(service service_interface.LobbyServiceInterface) *LobbyController {
 	return &LobbyController{
 		BaseController: NewBaseController(),
-		service:        service.NewLobbyService(),
+		service:        service,
 	}
 }
 
@@ -88,6 +87,16 @@ func (rc *LobbyController) Store(c echo.Context) error {
 	return rc.json(http.StatusOK, dto.NewLobbyResponse(lobby), c)
 }
 
+// EnterLobby
+// @title EnterLobby
+// @description Enter a lobby
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags lobby
+// @param enterLobbyRequest body dto.EnterLobbyRequest true "Enter lobby request"
+// @success 200 {object} dto.JSONResult{data=nil}
+// @router /lobbies/enter [post]
 func (rc *LobbyController) EnterLobby(c echo.Context) error {
 	request := dto.EnterLobbyRequest{}
 	if err := rc.handleRequest(&request, c); err != nil {
@@ -101,6 +110,16 @@ func (rc *LobbyController) EnterLobby(c echo.Context) error {
 	return rc.json(http.StatusOK, nil, c)
 }
 
+// LeaveLobby
+// @title LeaveLobby
+// @description Leave a lobby
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags lobby
+// @param leaveLobbyRequest body dto.LeaveLobbyRequest true "Leave lobby request"
+// @success 200 {object} dto.JSONResult{data=nil}
+// @router /lobbies/leave [post]
 func (rc *LobbyController) LeaveLobby(c echo.Context) error {
 	request := dto.LeaveLobbyRequest{}
 	if err := rc.handleRequest(&request, c); err != nil {

@@ -1,9 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"typograph_back/src/dto"
-	"typograph_back/src/service"
 	"typograph_back/src/service/service_interface"
 
 	"github.com/labstack/echo/v4"
@@ -14,10 +14,10 @@ type AuthController struct {
 	service service_interface.AuthServiceInterface
 }
 
-func NewAuthController() *AuthController {
+func NewAuthController(authService service_interface.AuthServiceInterface) *AuthController {
 	return &AuthController{
 		BaseController: NewBaseController(),
-		service:        service.NewAuthService(),
+		service:        authService,
 	}
 }
 
@@ -58,6 +58,7 @@ func (ac *AuthController) Register(c echo.Context) error {
 	if err := ac.handleRequest(&request, c); err != nil {
 		return err
 	}
+	fmt.Printf("request %s", request)
 
 	token, err := ac.service.Register(&request)
 	if err != nil {

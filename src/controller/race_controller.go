@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"typograph_back/src/dto"
-	"typograph_back/src/service"
 	"typograph_back/src/service/service_interface"
 
 	"github.com/labstack/echo/v4"
@@ -16,11 +15,14 @@ type RaceController struct {
 	userRaceResultService service_interface.UserRaceResultServiceInterface
 }
 
-func NewRaceController() *RaceController {
+func NewRaceController(
+	raceService service_interface.RaceServiceInterface,
+	userRaceResultService service_interface.UserRaceResultServiceInterface,
+) *RaceController {
 	return &RaceController{
 		BaseController:        NewBaseController(),
-		service:               service.NewRaceService(),
-		userRaceResultService: service.NewUserRaceResultService(),
+		service:               raceService,
+		userRaceResultService: userRaceResultService,
 	}
 }
 

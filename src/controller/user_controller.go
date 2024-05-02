@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"typograph_back/src/dto"
 	"typograph_back/src/exception"
-	"typograph_back/src/service"
 	"typograph_back/src/service/service_interface"
 
 	"github.com/labstack/echo/v4"
@@ -15,10 +14,10 @@ type UserController struct {
 	service service_interface.UserServiceInterface
 }
 
-func NewUserController() *UserController {
+func NewUserController(userService service_interface.UserServiceInterface) *UserController {
 	return &UserController{
 		BaseController: NewBaseController(),
-		service:        service.NewUserService(),
+		service:        userService,
 	}
 }
 

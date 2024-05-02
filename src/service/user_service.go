@@ -3,7 +3,6 @@ package service
 import (
 	"typograph_back/src/dto"
 	"typograph_back/src/model"
-	"typograph_back/src/repository"
 	"typograph_back/src/repository/repository_interface"
 	"typograph_back/src/service/service_interface"
 )
@@ -14,9 +13,9 @@ type UserService struct {
 	jwtService  service_interface.JWTServiceInterface
 }
 
-func NewUserService() *UserService {
+func NewUserService(repo repository_interface.UserRepositoryInterface) *UserService {
 	return &UserService{
-		repository:  repository.NewUserRepository(),
+		repository:  repo,
 		roleService: NewRoleService(),
 		jwtService:  NewJWTService(),
 	}

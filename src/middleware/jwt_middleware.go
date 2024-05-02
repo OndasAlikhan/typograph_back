@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"typograph_back/src/exception"
-	"typograph_back/src/service"
 	"typograph_back/src/service/service_interface"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,9 +14,9 @@ type JwtMiddleware struct {
 	secret      []byte
 }
 
-func NewJwtMiddleware(secret []byte, tokenPrefix string) *JwtMiddleware {
+func NewJwtMiddleware(secret []byte, tokenPrefix string, userService service_interface.UserServiceInterface) *JwtMiddleware {
 	return &JwtMiddleware{
-		userService: service.NewUserService(),
+		userService: userService,
 		tokenPrefix: tokenPrefix,
 		secret:      secret,
 	}

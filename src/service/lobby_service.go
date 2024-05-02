@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"typograph_back/src/dto"
 	"typograph_back/src/model"
-	"typograph_back/src/repository"
 	"typograph_back/src/repository/repository_interface"
 	"typograph_back/src/service/service_interface"
 )
@@ -15,11 +14,21 @@ type LobbyService struct {
 	repository     repository_interface.LobbyRepositoryInterface
 	userService    service_interface.UserServiceInterface
 	raceService    service_interface.RaceServiceInterface
-	lobbyWsService LobbyWsService
+	lobbyWsService *LobbyWsService
 }
 
-func NewLobbyService() *LobbyService {
-	return &LobbyService{repository: repository.NewLobbyRepository(), userService: NewUserService(), raceService: NewRaceService()}
+func NewLobbyService(
+	repo repository_interface.LobbyRepositoryInterface,
+	userService service_interface.UserServiceInterface,
+	raceService service_interface.RaceServiceInterface,
+	lobbyWsService *LobbyWsService,
+) *LobbyService {
+	return &LobbyService{
+		repository:     repo,
+		userService:    userService,
+		raceService:    raceService,
+		lobbyWsService: lobbyWsService,
+	}
 }
 
 func (ls *LobbyService) GetAll() ([]*model.Lobby, error) {
@@ -72,6 +81,9 @@ func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
 	if updateErr != nil {
 		return updateErr
 	}
+
+	ls.lobbyWsService.AddUserToRoom(lobbyId, userId)
+
 	return nil
 }
 
@@ -91,6 +103,9 @@ func (ls *LobbyService) LeaveLobby(lobbyId uint, userId uint) error {
 	if updateErr != nil {
 		return updateErr
 	}
+
+	ls.lobbyWsService.RemoveUserFromRoom(lobbyId, userId)
+
 	return nil
 }
 

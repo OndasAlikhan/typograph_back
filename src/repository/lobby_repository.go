@@ -18,6 +18,13 @@ func NewLobbyRepository() *LobbyRepository {
 	return &LobbyRepository{BaseRepository: NewBaseRepository[model.Lobby]()}
 }
 
+func (lr *LobbyRepository) GetAll() ([]*model.Lobby, error) {
+	var values []*model.Lobby
+	err := lr.connection.Preload("Users").Find(&values).Error
+
+	return values, err
+}
+
 func (lr *LobbyRepository) GetById(id uint) (*model.Lobby, *gorm.DB, error) {
 	var value *model.Lobby
 	result := lr.connection.Preload("Users").First(&value, id)

@@ -15,9 +15,9 @@ type AuthService struct {
 	jwtService  service_interface.JWTServiceInterface
 }
 
-func NewAuthService() *AuthService {
+func NewAuthService(userService service_interface.UserServiceInterface) *AuthService {
 	return &AuthService{
-		userService: NewUserService(),
+		userService: userService,
 		jwtService:  NewJWTService(),
 	}
 }
