@@ -103,4 +103,6 @@ func (lwr *LobbyWsRepository) AddClient(userId uint, conn *websocket.Conn) {
 
 func (lwr *LobbyWsRepository) RemoveClient(userId uint) {
 	delete(lwr.clients, userId)
+	fmt.Printf("Removed client %d\n", userId)
+	fmt.Printf("Clients:  %v\n", lwr.clients)
 }

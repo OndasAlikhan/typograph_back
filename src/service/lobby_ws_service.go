@@ -32,11 +32,9 @@ func (lws *LobbyWsService) RemoveUserFromRoom(roomId uint, userId uint) {
 }
 
 func (lws *LobbyWsService) AddClient(userId uint, conn *websocket.Conn) {
-	fmt.Printf("AddClient userId:%d conn:%s\n", userId, conn)
 	lws.repository.AddClient(userId, conn)
 }
 
 func (lws *LobbyWsService) RemoveClient(userId uint) {
-	fmt.Printf("RemoveClient userId:%d\n", userId)
 	lws.repository.RemoveClient(userId)
 }

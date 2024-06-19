@@ -74,6 +74,7 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 	fmt.Printf("-----BEFORE FOR-----\n")
 	for {
 		msgType, p, err := conn.ReadMessage()
+
 		if msgType != 1 {
 			return err
 		}
@@ -98,28 +99,30 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 			}
 
 			lwc.lobbyWsService.AddClient(connectionMsg.UserID, conn)
+
+			// handle if client disconnects
 			conn.SetCloseHandler(func(code int, text string) error {
 				lwc.lobbyWsService.RemoveClient(connectionMsg.UserID)
 				return nil
 			})
 
-		case enterLobbyType:
-			var enterLobbyMsg EnterLobbyMsg
-			err := json.Unmarshal(p, &enterLobbyMsg)
-
-			if err != nil {
-				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
-			}
-			lwc.lobbyWsService.AddUserToRoom(enterLobbyMsg.LobbyID, enterLobbyMsg.UserID)
-
-		case leaveLobbyType:
-			var leaveLobbyMsg LeaveLobbyMsg
-			err := json.Unmarshal(p, &leaveLobbyMsg)
-
-			if err != nil {
-				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
-			}
-			lwc.lobbyWsService.RemoveUserFromRoom(leaveLobbyMsg.LobbyID, leaveLobbyMsg.UserID)
+		//case enterLobbyType:
+		//	var enterLobbyMsg EnterLobbyMsg
+		//	err := json.Unmarshal(p, &enterLobbyMsg)
+		//
+		//	if err != nil {
+		//		conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
+		//	}
+		//	lwc.lobbyWsService.AddUserToRoom(enterLobbyMsg.LobbyID, enterLobbyMsg.UserID)
+		//
+		//case leaveLobbyType:
+		//	var leaveLobbyMsg LeaveLobbyMsg
+		//	err := json.Unmarshal(p, &leaveLobbyMsg)
+		//
+		//	if err != nil {
+		//		conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
+		//	}
+		//	lwc.lobbyWsService.RemoveUserFromRoom(leaveLobbyMsg.LobbyID, leaveLobbyMsg.UserID)
 
 		case broadcastInRoomType:
 			var broadcastInRoomMsg BroadcastInRoomMsg

@@ -12,19 +12,19 @@ services:
   #   depends_on:
   #     - typograph_back
 
-  typograph_back:
-    container_name: typograph-back-local
-    build: 
-      context: .
-      dockerfile: ./docker/local.dockerfile
-    ports:
-      - "${TYPOGRAPH_SERVICE_PORT}:8080"
-    volumes:
-      - ./:/usr/src/app
-    depends_on:
-      - typograph-db
-    env_file:
-      - .env
+#  typograph_back:
+#    container_name: typograph-back-local
+#    build:
+#      context: .
+#      dockerfile: ./docker/local.dockerfile
+#    ports:
+#      - "${TYPOGRAPH_SERVICE_PORT}:8080"
+#    volumes:
+#      - ./:/usr/src/app
+#    depends_on:
+#      - typograph-db
+#    env_file:
+#      - .env
 
   typograph-db:
     container_name: typograph-db-local
