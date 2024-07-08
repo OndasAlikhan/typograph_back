@@ -26,6 +26,11 @@ type LeaveLobbyRequest struct {
 	UserID  uint `json:"user_id" validate:"required"`
 }
 
+type UserFinishedRequest struct {
+	LobbyID uint `json:"lobby_id" validate:"required"`
+	UserID  uint `json:"user_id" validate:"required"`
+}
+
 type LobbyResponse struct {
 	ID          uint            `json:"id"`
 	AdminUserID uint            `json:"admin_user_id"`

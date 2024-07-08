@@ -18,7 +18,6 @@ func NewLobbyWsService(repo *repository.LobbyWsRepository) *LobbyWsService {
 
 func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text []dto.Letter) {
 	lws.repository.SaveUserText(roomId, userId, text)
-	lws.repository.BroadcastToRoom(roomId)
 }
 
 func (lws *LobbyWsService) AddUserToRoom(roomId uint, userId uint) {

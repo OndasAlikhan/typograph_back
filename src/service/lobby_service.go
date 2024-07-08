@@ -50,7 +50,7 @@ func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, e
 
 	lobby := model.Lobby{
 		AdminUserID: request.AdminUserID,
-		Status:      "active",
+		Status:      "waiting",
 		Name:        request.Name,
 		Users:       users,
 		Races:       races,
@@ -84,6 +84,10 @@ func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
 
 	ls.lobbyWsService.AddUserToRoom(lobbyId, userId)
 
+	return nil
+}
+
+func (ls *LobbyService) UserFinished(request *dto.UserFinishedRequest) error {
 	return nil
 }
 
@@ -153,4 +157,22 @@ func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model
 
 func (ls *LobbyService) Delete(id uint) error {
 	return ls.repository.Delete(id)
+}
+
+func (ls *LobbyService) StartLobby(id uint) error {
+	lobby, _, err := ls.repository.GetById(id)
+	if err != nil {
+		return err
+	}
+
+	lobby.Status = "starting"
+	_, _, saveErr := ls.repository.Save(*lobby)
+	if saveErr != nil {
+		return saveErr
+	}
+
+	// todo change status in lobby_ws_repository
+	// then after 3 seconds change status to running
+
+	return nil
 }

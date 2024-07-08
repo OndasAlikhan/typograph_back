@@ -184,3 +184,41 @@ func (rc *LobbyController) Delete(c echo.Context) error {
 
 	return rc.json(http.StatusOK, nil, c)
 }
+
+// StartLobby
+// @title StartLobby
+// @description Start a lobby race
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags lobby
+// @param id path int true "Lobby ID"
+// @success 200 {object} dto.JSONResult
+// @router /lobbies/{id}/start [patch]
+func (rc *LobbyController) StartLobby(c echo.Context) error {
+	id, err := rc.parseToUint(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	startLobbyErr := rc.service.StartLobby(id)
+	if startLobbyErr != nil {
+		return startLobbyErr
+	}
+
+	return nil
+}
+
+func (rc *LobbyController) UserFinished(c echo.Context) error {
+	request := dto.UserFinishedRequest{}
+	if err := rc.handleRequest(&request, c); err != nil {
+		return err
+	}
+
+	userFinishedErr := rc.service.UserFinished(&request)
+	if userFinishedErr != nil {
+		return userFinishedErr
+	}
+
+	return nil
+}
