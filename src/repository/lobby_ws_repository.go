@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"typograph_back/src/dto"
@@ -9,10 +10,10 @@ import (
 )
 
 type Room struct {
-	texts      map[uint][]dto.Letter
-	users      []uint
-	users_done map[uint]bool
-	status     string // waiting starting running finished
+	Texts     map[uint][]dto.Letter `json:"texts"`
+	Users     []uint                `json:"users"`
+	UsersDone map[uint]bool         `json:"users_done"`
+	Status    string                `json:"status"` // waiting starting running finished
 }
 
 type LobbyWsRepository struct {
@@ -33,7 +34,7 @@ func (lwr *LobbyWsRepository) SaveUserText(roomId uint, userId uint, text []dto.
 	defer lwr.mut.RUnlock()
 
 	if entry, ok := lwr.rooms[roomId]; ok {
-		entry.texts[userId] = text
+		entry.Texts[userId] = text
 		lwr.rooms[roomId] = entry
 	}
 
@@ -41,11 +42,11 @@ func (lwr *LobbyWsRepository) SaveUserText(roomId uint, userId uint, text []dto.
 }
 
 func (lwr *LobbyWsRepository) GetUserText(roomId uint, userId uint) []dto.Letter {
-	return lwr.rooms[roomId].texts[userId]
+	return lwr.rooms[roomId].Texts[userId]
 }
 
 func (lwr *LobbyWsRepository) BroadcastToRoom(roomId uint) {
-	userIds := lwr.rooms[roomId].users
+	userIds := lwr.rooms[roomId].Users
 	connections := make([]*websocket.Conn, 0)
 	for _, userId := range userIds {
 		if conn, ok := lwr.clients[userId]; ok {
@@ -53,8 +54,12 @@ func (lwr *LobbyWsRepository) BroadcastToRoom(roomId uint) {
 		}
 	}
 
+	fmt.Printf("Repo Broadcast connections: %v\n", connections)
 	for _, conn := range connections {
-		conn.WriteJSON(lwr.rooms[roomId])
+		fmt.Printf("Repo Broadcast json: %v\n", lwr.rooms[roomId])
+		json, _ := json.Marshal(lwr.rooms[roomId])
+		stringJSON := string(json)
+		conn.WriteJSON(stringJSON)
 	}
 }
 
@@ -65,24 +70,24 @@ func (lwr *LobbyWsRepository) AddUserToRoom(roomId uint, userId uint) {
 	lwr.createRoom(roomId)
 
 	if entry, ok := lwr.rooms[roomId]; ok {
-		entry.users = append(entry.users, userId)
-		entry.users_done[userId] = false
+		entry.Users = append(entry.Users, userId)
+		entry.UsersDone[userId] = false
 		lwr.rooms[roomId] = entry
 	}
 
 	lwr.BroadcastToRoom(roomId)
 
-	fmt.Printf("Added user %d to room %d\n", userId, roomId)
-	fmt.Printf("Rooms: %v\n", lwr.rooms)
+	fmt.Printf("Repo Added user %d to room %d\n", userId, roomId)
+	fmt.Printf("Repo Rooms: %v\n", lwr.rooms)
 }
 
 func (lwr *LobbyWsRepository) createRoom(roomId uint) {
 	if _, ok := lwr.rooms[roomId]; !ok {
 		lwr.rooms[roomId] = Room{
-			texts:      make(map[uint][]dto.Letter),
-			users:      make([]uint, 0),
-			users_done: make(map[uint]bool),
-			status:     "waiting",
+			Texts:     make(map[uint][]dto.Letter),
+			Users:     make([]uint, 0),
+			UsersDone: make(map[uint]bool),
+			Status:    "waiting",
 		}
 	}
 }
@@ -92,11 +97,11 @@ func (lwr *LobbyWsRepository) RemoveUserFromRoom(roomId uint, userId uint) {
 	defer lwr.mut.Unlock()
 
 	if entry, ok := lwr.rooms[roomId]; ok {
-		for i, user := range entry.users {
+		for i, user := range entry.Users {
 			if user == userId {
-				entry.users = append(entry.users[:i], entry.users[i+1:]...)
-				delete(entry.users_done, userId)
-				delete(entry.texts, userId)
+				entry.Users = append(entry.Users[:i], entry.Users[i+1:]...)
+				delete(entry.UsersDone, userId)
+				delete(entry.Texts, userId)
 				lwr.rooms[roomId] = entry
 				break
 			}
@@ -126,7 +131,7 @@ func (lwr *LobbyWsRepository) RemoveClient(userId uint) {
 func (lwr *LobbyWsRepository) UserFinished(roomId uint, userId uint) error {
 	lwr.mut.RLock()
 	if room, ok := lwr.rooms[roomId]; ok {
-		room.users_done[userId] = true
+		room.UsersDone[userId] = true
 	}
 	lwr.mut.RUnlock()
 	lwr.BroadcastToRoom(roomId)
@@ -135,3 +140,13 @@ func (lwr *LobbyWsRepository) UserFinished(roomId uint, userId uint) error {
 }
 
 // todo ChangeStatus
+func (lwr *LobbyWsRepository) ChangeStatus(roomId uint, status string) error {
+	lwr.mut.RLock()
+	if room, ok := lwr.rooms[roomId]; ok {
+		room.Status = status
+	}
+	lwr.mut.RUnlock()
+	lwr.BroadcastToRoom(roomId)
+
+	return nil
+}

@@ -38,9 +38,11 @@ func (lr *LobbyRepository) Save(lobby model.Lobby) (*model.Lobby, *gorm.DB, erro
 
 	return &lobby, result, result.Error
 }
-func (lr *LobbyRepository) UpdateUsers(users []*model.User, tx *gorm.DB) error {
-	return tx.Association("Users").Replace(users)
+func (lr *LobbyRepository) UpdateUsers(users []*model.User, lobby *model.Lobby) error {
+	fmt.Printf("UpdateUsers users: %v\n", users)
+	return lr.connection.Model(lobby).Association("Users").Replace(users)
 }
-func (lr *LobbyRepository) UpdateRaces(races []*model.Race, tx *gorm.DB) error {
-	return tx.Association("Races").Replace(races)
+
+func (lr *LobbyRepository) UpdateRaces(races []*model.Race, lobby *model.Lobby) error {
+	return lr.connection.Model(lobby).Association("Races").Replace(races)
 }

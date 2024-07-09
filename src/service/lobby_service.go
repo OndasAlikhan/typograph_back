@@ -65,7 +65,7 @@ func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, e
 }
 
 func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
-	lobby, tx, err := ls.repository.GetById(lobbyId)
+	lobby, _, err := ls.repository.GetById(lobbyId)
 	if err != nil {
 		return err
 	}
@@ -74,10 +74,9 @@ func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
 	if err != nil {
 		return fmt.Errorf("user with id %d not found: %s", userId, err)
 	}
-
 	lobbyUsers := append(lobby.Users, newUser)
 
-	updateErr := ls.repository.UpdateUsers(lobbyUsers, tx)
+	updateErr := ls.repository.UpdateUsers(lobbyUsers, lobby)
 	if updateErr != nil {
 		return updateErr
 	}
@@ -87,15 +86,17 @@ func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
 	return nil
 }
 
+// todo finish UserFinished
 func (ls *LobbyService) UserFinished(request *dto.UserFinishedRequest) error {
 	return nil
 }
 
 func (ls *LobbyService) LeaveLobby(lobbyId uint, userId uint) error {
-	lobby, tx, err := ls.repository.GetById(lobbyId)
+	lobby, _, err := ls.repository.GetById(lobbyId)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("before lobby.Users: %v \n", lobby.Users)
 
 	updatedUsers := make([]*model.User, 0)
 	for _, user := range lobby.Users {
@@ -103,11 +104,14 @@ func (ls *LobbyService) LeaveLobby(lobbyId uint, userId uint) error {
 			updatedUsers = append(updatedUsers, user)
 		}
 	}
-	updateErr := ls.repository.UpdateUsers(updatedUsers, tx)
+	fmt.Printf("after lobby.Users: %v \n", updatedUsers)
+
+	updateErr := ls.repository.UpdateUsers(updatedUsers, lobby)
 	if updateErr != nil {
 		return updateErr
 	}
 
+	fmt.Println("before calling wsService")
 	ls.lobbyWsService.RemoveUserFromRoom(lobbyId, userId)
 
 	return nil
@@ -123,7 +127,7 @@ func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model
 	lobby.AdminUserID = request.AdminUserID
 	lobby.Status = request.Status
 
-	result, tx, err := ls.repository.Save(*lobby)
+	result, _, err := ls.repository.Save(*lobby)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +138,7 @@ func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model
 			return nil, err
 		}
 
-		updateUserErr := ls.repository.UpdateUsers(users, tx)
+		updateUserErr := ls.repository.UpdateUsers(users, result)
 		if updateUserErr != nil {
 			return nil, updateUserErr
 		}
@@ -146,7 +150,7 @@ func (ls *LobbyService) Update(id uint, request *dto.LobbyUpdateRequest) (*model
 			return nil, err
 		}
 
-		updateRaceErr := ls.repository.UpdateRaces(races, tx)
+		updateRaceErr := ls.repository.UpdateRaces(races, result)
 		if updateRaceErr != nil {
 			return nil, updateRaceErr
 		}

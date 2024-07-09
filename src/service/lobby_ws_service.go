@@ -21,12 +21,12 @@ func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text []dto.Le
 }
 
 func (lws *LobbyWsService) AddUserToRoom(roomId uint, userId uint) {
-	fmt.Printf("AddUserToRoom roomId:%d userId:%d\n", roomId, userId)
+	fmt.Printf("Service AddUserToRoom roomId:%d userId:%d\n", roomId, userId)
 	lws.repository.AddUserToRoom(roomId, userId)
 }
 
 func (lws *LobbyWsService) RemoveUserFromRoom(roomId uint, userId uint) {
-	fmt.Printf("RemoveUserFromRoom roomId:%d userId:%d\n", roomId, userId)
+	fmt.Printf("Service RemoveUserFromRoom roomId:%d userId:%d\n", roomId, userId)
 	lws.repository.RemoveUserFromRoom(roomId, userId)
 }
 
