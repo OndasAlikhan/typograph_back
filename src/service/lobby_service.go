@@ -81,7 +81,7 @@ func (ls *LobbyService) EnterLobby(lobbyId uint, userId uint) error {
 		return updateErr
 	}
 
-	ls.lobbyWsService.AddUserToRoom(lobbyId, userId)
+	ls.lobbyWsService.AddUserToRoom(lobbyId, newUser)
 
 	return nil
 }

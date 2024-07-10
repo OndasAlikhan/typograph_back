@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"typograph_back/src/dto"
+	"typograph_back/src/model"
 	"typograph_back/src/repository"
 
 	"github.com/gorilla/websocket"
@@ -20,9 +21,10 @@ func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text []dto.Le
 	lws.repository.SaveUserText(roomId, userId, text)
 }
 
-func (lws *LobbyWsService) AddUserToRoom(roomId uint, userId uint) {
-	fmt.Printf("Service AddUserToRoom roomId:%d userId:%d\n", roomId, userId)
-	lws.repository.AddUserToRoom(roomId, userId)
+func (lws *LobbyWsService) AddUserToRoom(roomId uint, user *model.User) {
+	fmt.Printf("Service AddUserToRoom roomId:%d user:%v\n", roomId, user)
+	userDto := dto.NewUserResponse(user)
+	lws.repository.AddUserToRoom(roomId, *userDto)
 }
 
 func (lws *LobbyWsService) RemoveUserFromRoom(roomId uint, userId uint) {
