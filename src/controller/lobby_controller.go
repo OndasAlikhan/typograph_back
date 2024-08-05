@@ -43,6 +43,23 @@ func (rc *LobbyController) Index(c echo.Context) error {
 	return rc.json(http.StatusOK, response, c)
 }
 
+// GetRoomInfo
+// @title GetRoomInfo
+// @description Get room information by id
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags lobby
+// @success 200 {object} dto.JSONResult{data=dto.Room}
+// @router /room/{id} [get]
+func (rc *LobbyController) GetRoomInfo(c echo.Context) error {
+	id, err := rc.parseToUint(c.Param("id"))
+	if err != nil {
+		return err
+	}
+	return rc.json(http.StatusOK, rc.service.GetRoomInfo(id), c)
+}
+
 // Show
 // @title Show
 // @description Get a lobby by id
@@ -206,9 +223,19 @@ func (rc *LobbyController) StartLobby(c echo.Context) error {
 		return startLobbyErr
 	}
 
-	return nil
+	return rc.json(http.StatusOK, nil, c)
 }
 
+// UserFinished
+// @title UserFinished
+// @description Mark a user as finished in a lobby race
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @tags lobby
+// @param request body dto.UserFinishedRequest true "User Finished Request"
+// @success 200 {object} dto.JSONResult
+// @router /lobbies/user-finished [post]
 func (rc *LobbyController) UserFinished(c echo.Context) error {
 	request := dto.UserFinishedRequest{}
 	if err := rc.handleRequest(&request, c); err != nil {
@@ -220,5 +247,5 @@ func (rc *LobbyController) UserFinished(c echo.Context) error {
 		return userFinishedErr
 	}
 
-	return nil
+	return rc.json(http.StatusOK, nil, c)
 }

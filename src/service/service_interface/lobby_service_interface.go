@@ -8,6 +8,7 @@ import (
 type LobbyServiceInterface interface {
 	GetAll() ([]*model.Lobby, error)
 	GetById(id uint) (*model.Lobby, error)
+	GetRoomInfo(roomId uint) dto.Room
 	Create(request *dto.LobbyCreateRequest) (*model.Lobby, error)
 	EnterLobby(lobbyId uint, userId uint) error
 	LeaveLobby(lobbyId uint, userId uint) error

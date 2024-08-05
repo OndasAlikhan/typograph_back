@@ -21,6 +21,14 @@ func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text []dto.Le
 	lws.repository.SaveUserText(roomId, userId, text)
 }
 
+func (lws *LobbyWsService) GetRoomInfo(roomId uint) dto.Room {
+	return lws.repository.GetRoomInfo(roomId)
+}
+
+func (lws *LobbyWsService) StartLobby(roomId uint) {
+	lws.repository.ChangeStatus(roomId, "running")
+}
+
 func (lws *LobbyWsService) AddUserToRoom(roomId uint, user *model.User) {
 	fmt.Printf("Service AddUserToRoom roomId:%d user:%v\n", roomId, user)
 	userDto := dto.NewUserResponse(user)
@@ -38,4 +46,8 @@ func (lws *LobbyWsService) AddClient(userId uint, conn *websocket.Conn) {
 
 func (lws *LobbyWsService) RemoveClient(userId uint) {
 	lws.repository.RemoveClient(userId)
+}
+
+func (lws *LobbyWsService) Sync(rooms []repository.RoomWithId) {
+	lws.repository.Sync(rooms)
 }

@@ -9,35 +9,37 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Room struct {
-	Texts     map[uint][]dto.Letter `json:"texts"`
-	Users     []dto.UserResponse    `json:"users"`
-	UsersDone map[uint]bool         `json:"users_done"`
-	Status    string                `json:"status"` // waiting starting running finished
+type RoomWithId struct {
+	ID uint
+	dto.Room
 }
 
 type LobbyWsRepository struct {
 	mut     sync.RWMutex
 	clients map[uint]*websocket.Conn
-	rooms   map[uint]Room
+	rooms   map[uint]dto.Room
 }
 
 func NewLobbyWsRepository() *LobbyWsRepository {
 	return &LobbyWsRepository{
 		clients: make(map[uint]*websocket.Conn),
-		rooms:   make(map[uint]Room),
+		rooms:   make(map[uint]dto.Room),
 	}
 }
 
 // todo Sync
-func (lwr *LobbyWsRepository) Sync(rooms []Room) {
-	// for _, room := range rooms {
-	// 	addRoom := Room{
-	// 		Users:  room.Users,
-	// 		Status: room.Status,
-	// 	}
-	// 	lwr.rooms = append(lwr.rooms, addRoom)
-	// }
+func (lwr *LobbyWsRepository) Sync(rooms []RoomWithId) {
+	for _, room := range rooms {
+		addRoom := dto.Room{
+			Texts:     make(map[uint][]dto.Letter),
+			Users:     room.Users,
+			UsersDone: make(map[uint]bool),
+			Status:    room.Status,
+		}
+		lwr.rooms[room.ID] = addRoom
+	}
+
+	fmt.Printf("Synced rooms: %v\n", lwr.rooms)
 }
 
 func (lwr *LobbyWsRepository) SaveUserText(roomId uint, userId uint, text []dto.Letter) {
@@ -52,8 +54,8 @@ func (lwr *LobbyWsRepository) SaveUserText(roomId uint, userId uint, text []dto.
 	lwr.BroadcastToRoom(roomId, "update_text")
 }
 
-func (lwr *LobbyWsRepository) GetUserText(roomId uint, userId uint) []dto.Letter {
-	return lwr.rooms[roomId].Texts[userId]
+func (lwr *LobbyWsRepository) GetRoomInfo(roomId uint) dto.Room {
+	return lwr.rooms[roomId]
 }
 
 func (lwr *LobbyWsRepository) BroadcastToRoom(roomId uint, messageType string) {
@@ -77,8 +79,8 @@ func (lwr *LobbyWsRepository) BroadcastToRoom(roomId uint, messageType string) {
 			Data: lwr.rooms[roomId],
 		}
 		json, _ := json.Marshal(wsMsg)
-		stringJson := string(json)
-		conn.WriteJSON(stringJson)
+		// stringJson := string(json)
+		conn.WriteMessage(websocket.TextMessage, json)
 	}
 }
 
@@ -86,9 +88,11 @@ func (lwr *LobbyWsRepository) AddUserToRoom(roomId uint, user dto.UserResponse) 
 	lwr.mut.Lock()
 	defer lwr.mut.Unlock()
 
+	fmt.Printf("Adding user to room %d\n", roomId)
 	lwr.createRoom(roomId)
 
 	if entry, ok := lwr.rooms[roomId]; ok {
+		fmt.Printf("entry: %v\n", entry)
 		entry.Users = append(entry.Users, user)
 		entry.UsersDone[user.ID] = false
 		lwr.rooms[roomId] = entry
@@ -102,7 +106,7 @@ func (lwr *LobbyWsRepository) AddUserToRoom(roomId uint, user dto.UserResponse) 
 
 func (lwr *LobbyWsRepository) createRoom(roomId uint) {
 	if _, ok := lwr.rooms[roomId]; !ok {
-		lwr.rooms[roomId] = Room{
+		lwr.rooms[roomId] = dto.Room{
 			Texts:     make(map[uint][]dto.Letter),
 			Users:     make([]dto.UserResponse, 0),
 			UsersDone: make(map[uint]bool),

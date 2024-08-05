@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"typograph_back/src/dto"
 	"typograph_back/src/model"
+	"typograph_back/src/repository"
 	"typograph_back/src/repository/repository_interface"
 	"typograph_back/src/service/service_interface"
 )
@@ -23,12 +24,15 @@ func NewLobbyService(
 	raceService service_interface.RaceServiceInterface,
 	lobbyWsService *LobbyWsService,
 ) *LobbyService {
-	return &LobbyService{
+	ls := &LobbyService{
 		repository:     repo,
 		userService:    userService,
 		raceService:    raceService,
 		lobbyWsService: lobbyWsService,
 	}
+	ls.populateLobbyWs()
+
+	return ls
 }
 
 func (ls *LobbyService) GetAll() ([]*model.Lobby, error) {
@@ -38,6 +42,10 @@ func (ls *LobbyService) GetAll() ([]*model.Lobby, error) {
 func (ls *LobbyService) GetById(id uint) (*model.Lobby, error) {
 	lobby, _, err := ls.repository.GetById(id)
 	return lobby, err
+}
+
+func (ls *LobbyService) GetRoomInfo(roomId uint) dto.Room {
+	return ls.lobbyWsService.GetRoomInfo(roomId)
 }
 
 func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, error) {
@@ -169,7 +177,7 @@ func (ls *LobbyService) StartLobby(id uint) error {
 		return err
 	}
 
-	lobby.Status = "starting"
+	lobby.Status = "running"
 	_, _, saveErr := ls.repository.Save(*lobby)
 	if saveErr != nil {
 		return saveErr
@@ -177,6 +185,40 @@ func (ls *LobbyService) StartLobby(id uint) error {
 
 	// todo change status in lobby_ws_repository
 	// then after 3 seconds change status to running
+	ls.lobbyWsService.StartLobby(id)
+
+	return nil
+}
+
+func (ls *LobbyService) populateLobbyWs() error {
+	lobbies, err := ls.repository.GetAll()
+	if err != nil {
+		return err
+	}
+
+	rooms := make([]repository.RoomWithId, 0)
+
+	for _, lobby := range lobbies {
+		users := make([]dto.UserResponse, 0)
+		for _, u := range lobby.Users {
+			users = append(users, dto.UserResponse{
+				ID:        u.ID,
+				Email:     u.Email,
+				Name:      u.Name,
+				CreatedAt: u.CreatedAt.Unix(),
+			})
+		}
+
+		rooms = append(rooms, repository.RoomWithId{
+			ID: lobby.ID,
+			Room: dto.Room{
+				Status: lobby.Status,
+				Users:  users,
+			},
+		})
+
+		ls.lobbyWsService.Sync(rooms)
+	}
 
 	return nil
 }

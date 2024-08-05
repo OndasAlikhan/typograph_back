@@ -74,7 +74,8 @@ func RegisterRoute(urlPrefix string) {
 	routeGroup.DELETE("/lobbies", lobbyController.Delete, authM.Run())
 	routeGroup.POST("/lobbies/enter", lobbyController.EnterLobby, authM.Run())
 	routeGroup.POST("/lobbies/leave", lobbyController.LeaveLobby, authM.Run())
-	routeGroup.PATCH("/lobbues/:id/start", lobbyController.StartLobby, authM.Run())
+	routeGroup.PATCH("/lobbies/:id/start", lobbyController.StartLobby, authM.Run())
+	routeGroup.GET("/room/:id", lobbyController.GetRoomInfo, authM.Run())
 
 	routeGroup.GET("/ws", lobbyWSController.Index)
 }
