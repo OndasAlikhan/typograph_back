@@ -9,7 +9,7 @@ type RaceCreateRequest struct {
 	AdminUserID uint   `json:"admin_user_id" validate:"required"`
 	LobbyID     uint   `json:"lobby_id" validate:"required"`
 	Users       []uint `json:"users" validate:"required"`
-	ParagraphID uint   `json:"paragraph_id" validate:"required"`
+	Text        string `json:"text" validate:"required"`
 }
 
 type RaceUpdateRequest struct {
@@ -18,7 +18,7 @@ type RaceUpdateRequest struct {
 	AdminUserID uint   `json:"admin_user_id" validate:"required"`
 	LobbyID     uint   `json:"lobby_id" validate:"required"`
 	Users       []uint `json:"users" validate:"required"`
-	ParagraphID uint   `json:"paragraph_id" validate:"required"`
+	Text        string `json:"text" validate:"required"`
 }
 
 type RaceResponse struct {
@@ -26,7 +26,7 @@ type RaceResponse struct {
 	AdminUserID uint            `json:"admin_user_id"`
 	LobbyID     uint            `json:"lobby_id"`
 	Users       []*UserResponse `json:"users"`
-	ParagraphID uint            `json:"paragraph_id"`
+	Text        string          `json:"text"`
 }
 
 func NewRaceResponse(race *model.Race) *RaceResponse {
@@ -40,6 +40,6 @@ func NewRaceResponse(race *model.Race) *RaceResponse {
 		AdminUserID: race.AdminUserID,
 		LobbyID:     race.LobbyID,
 		Users:       usersResponse,
-		ParagraphID: race.ParagraphID,
+		Text:        race.Text,
 	}
 }

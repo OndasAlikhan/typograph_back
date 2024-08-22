@@ -171,13 +171,14 @@ func (ls *LobbyService) Delete(id uint) error {
 	return ls.repository.Delete(id)
 }
 
-func (ls *LobbyService) StartLobby(id uint) error {
+func (ls *LobbyService) StartLobby(id uint, text string) error {
 	lobby, _, err := ls.repository.GetById(id)
 	if err != nil {
 		return err
 	}
 
 	lobby.Status = "running"
+	lobby.Text = text
 	_, _, saveErr := ls.repository.Save(*lobby)
 	if saveErr != nil {
 		return saveErr

@@ -10,7 +10,6 @@ type Race struct {
 	AdminUserID     uint
 	AdminUser       *User   `gorm:"foreignKey:AdminUserID"`
 	Users           []*User `gorm:"many2many:race_users;"`
-	ParagraphID     uint
-	Paragraph       *Paragraph        `gorm:"foreignKey:ParagraphID"`
+	Text            string
 	UserRaceResults []*UserRaceResult `gorm:"foreignKey:RaceID"`
 }

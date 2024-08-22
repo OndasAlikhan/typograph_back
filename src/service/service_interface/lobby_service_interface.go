@@ -14,6 +14,6 @@ type LobbyServiceInterface interface {
 	LeaveLobby(lobbyId uint, userId uint) error
 	Update(id uint, request *dto.LobbyUpdateRequest) (*model.Lobby, error)
 	Delete(id uint) error
-	StartLobby(id uint) error
+	StartLobby(id uint, text string) error
 	UserFinished(request *dto.UserFinishedRequest) error
 }

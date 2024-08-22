@@ -218,7 +218,12 @@ func (rc *LobbyController) StartLobby(c echo.Context) error {
 		return err
 	}
 
-	startLobbyErr := rc.service.StartLobby(id)
+	request := dto.StartLobbyRequest{}
+	if err := rc.handleRequest(&request, c); err != nil {
+		return err
+	}
+
+	startLobbyErr := rc.service.StartLobby(id, request.Text)
 	if startLobbyErr != nil {
 		return startLobbyErr
 	}

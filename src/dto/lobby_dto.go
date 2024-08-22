@@ -7,6 +7,7 @@ type LobbyCreateRequest struct {
 	Name        string `json:"name" validate:"required"`
 	Users       []uint `json:"users" validate:"required"`
 	Races       []uint `json:"races"`
+	Text        string `json:"text"`
 }
 type LobbyUpdateRequest struct {
 	ID          uint   `json:"id" validate:"required"`
@@ -15,6 +16,7 @@ type LobbyUpdateRequest struct {
 	Name        string `json:"name" validate:"required"`
 	Users       []uint `json:"users" validate:"required"`
 	Races       []uint `json:"races"`
+	Text        string `json:"text"`
 }
 type EnterLobbyRequest struct {
 	LobbyID uint `json:"lobby_id" validate:"required"`
@@ -31,6 +33,10 @@ type UserFinishedRequest struct {
 	UserID  uint `json:"user_id" validate:"required"`
 }
 
+type StartLobbyRequest struct {
+	Text string `json:"text"`
+}
+
 type LobbyResponse struct {
 	ID          uint            `json:"id"`
 	AdminUserID uint            `json:"admin_user_id"`
@@ -38,6 +44,7 @@ type LobbyResponse struct {
 	Name        string          `json:"name"`
 	Users       []*UserResponse `json:"users"`
 	Races       []*RaceResponse `json:"races"`
+	Text        string          `json:"text"`
 }
 
 func NewLobbyResponse(lobby *model.Lobby) *LobbyResponse {
@@ -58,5 +65,6 @@ func NewLobbyResponse(lobby *model.Lobby) *LobbyResponse {
 		Name:        lobby.Name,
 		Users:       usersResponse,
 		Races:       racesResponse,
+		Text:        lobby.Text,
 	}
 }

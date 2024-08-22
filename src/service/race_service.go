@@ -42,7 +42,7 @@ func (rs *RaceService) Create(request *dto.RaceCreateRequest) (*model.Race, erro
 	race := model.Race{
 		Finished:    request.Finished,
 		AdminUserID: request.AdminUserID,
-		ParagraphID: request.ParagraphID,
+		Text:        request.Text,
 		LobbyID:     request.LobbyID,
 		Users:       users,
 	}
@@ -59,7 +59,7 @@ func (rs *RaceService) Update(id uint, request *dto.RaceUpdateRequest) (*model.R
 
 	race.Finished = request.Finished
 	race.AdminUserID = request.AdminUserID
-	race.ParagraphID = request.ParagraphID
+	race.Text = request.Text
 	race.LobbyID = request.LobbyID
 
 	result, tx, err := rs.repository.Save(*race)
