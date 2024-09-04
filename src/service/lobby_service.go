@@ -69,6 +69,13 @@ func (ls *LobbyService) Create(request *dto.LobbyCreateRequest) (*model.Lobby, e
 		return nil, err
 	}
 
+	adminUser, err := ls.userService.GetById(value.AdminUserID)
+	if err != nil {
+		fmt.Printf("could not find admin user")
+	}
+
+	ls.lobbyWsService.AddUserToRoom(value.ID, adminUser)
+
 	return value, err
 }
 

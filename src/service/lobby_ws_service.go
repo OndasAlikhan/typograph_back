@@ -17,7 +17,7 @@ func NewLobbyWsService(repo *repository.LobbyWsRepository) *LobbyWsService {
 	return &LobbyWsService{repository: repo}
 }
 
-func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text []dto.Letter) {
+func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text [][]dto.Letter) {
 	lws.repository.SaveUserText(roomId, userId, text)
 }
 

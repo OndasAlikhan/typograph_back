@@ -33,21 +33,23 @@ type ConnectionMsg struct {
 	Type   string `json:"type"`
 	UserID uint   `json:"user_id"`
 }
-type EnterLobbyMsg struct {
-	Type    string `json:"type"`
-	UserID  uint   `json:"user_id"`
-	LobbyID uint   `json:"lobby_id"`
-}
-type LeaveLobbyMsg struct {
-	Type    string `json:"type"`
-	UserID  uint   `json:"user_id"`
-	LobbyID uint   `json:"lobby_id"`
-}
+
+//	type EnterLobbyMsg struct {
+//		Type    string `json:"type"`
+//		UserID  uint   `json:"user_id"`
+//		LobbyID uint   `json:"lobby_id"`
+//	}
+//
+//	type LeaveLobbyMsg struct {
+//		Type    string `json:"type"`
+//		UserID  uint   `json:"user_id"`
+//		LobbyID uint   `json:"lobby_id"`
+//	}
 type BroadcastInRoomMsg struct {
-	Type    string       `json:"type"`
-	LobbyID uint         `json:"lobby_id"`
-	UserID  uint         `json:"user_id"`
-	Text    []dto.Letter `json:"text"`
+	Type    string         `json:"type"`
+	LobbyID uint           `json:"lobby_id"`
+	UserID  uint           `json:"user_id"`
+	Text    [][]dto.Letter `json:"text"`
 }
 
 type LobbyWSController struct {
@@ -131,7 +133,7 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 			if err != nil {
 				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
 			}
-			fmt.Printf("broadcastMessage: %v\n", broadcastInRoomMsg)
+			fmt.Printf("broadcastMessage.text: %v\n", broadcastInRoomMsg.Text)
 			lwc.lobbyWsService.HandleNewText(broadcastInRoomMsg.LobbyID, broadcastInRoomMsg.UserID, broadcastInRoomMsg.Text)
 		}
 
