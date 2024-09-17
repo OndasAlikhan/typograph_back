@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
 	"typograph_back/src/dto"
+
 	"typograph_back/src/service"
 
 	"github.com/gorilla/websocket"
@@ -19,10 +19,11 @@ var upgrader = websocket.Upgrader{
 }
 
 const (
-	connectionType      = "CONNECTION"
-	enterLobbyType      = "ENTER_LOBBY"
-	leaveLobbyType      = "LEAVE_LOBBY"
-	broadcastInRoomType = "BROADCAST_IN_ROOM"
+	connectionType = "CONNECTION"
+	enterLobbyType = "ENTER_LOBBY"
+	leaveLobbyType = "LEAVE_LOBBY"
+	updateTextType = "UPDATE_TEXT"
+	finishType     = "FINISH"
 )
 
 type TypeSwitch struct {
@@ -45,12 +46,6 @@ type ConnectionMsg struct {
 //		UserID  uint   `json:"user_id"`
 //		LobbyID uint   `json:"lobby_id"`
 //	}
-type BroadcastInRoomMsg struct {
-	Type    string         `json:"type"`
-	LobbyID uint           `json:"lobby_id"`
-	UserID  uint           `json:"user_id"`
-	Text    [][]dto.Letter `json:"text"`
-}
 
 type LobbyWSController struct {
 	*BaseController
@@ -64,7 +59,6 @@ func NewLobbyWSController(lws *service.LobbyWsService) *LobbyWSController {
 }
 
 func (lwc LobbyWSController) Index(c echo.Context) error {
-	fmt.Printf("----connecting...\n")
 	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		fmt.Printf("Failed to set websocket upgrade: %+v\n", err)
@@ -73,7 +67,6 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 
 	defer conn.Close()
 
-	fmt.Printf("-----BEFORE FOR-----\n")
 	for {
 		msgType, p, err := conn.ReadMessage()
 
@@ -108,49 +101,24 @@ func (lwc LobbyWSController) Index(c echo.Context) error {
 				return nil
 			})
 
-		//case enterLobbyType:
-		//	var enterLobbyMsg EnterLobbyMsg
-		//	err := json.Unmarshal(p, &enterLobbyMsg)
-		//
-		//	if err != nil {
-		//		conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
-		//	}
-		//	lwc.lobbyWsService.AddUserToRoom(enterLobbyMsg.LobbyID, enterLobbyMsg.UserID)
-		//
-		//case leaveLobbyType:
-		//	var leaveLobbyMsg LeaveLobbyMsg
-		//	err := json.Unmarshal(p, &leaveLobbyMsg)
-		//
-		//	if err != nil {
-		//		conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
-		//	}
-		//	lwc.lobbyWsService.RemoveUserFromRoom(leaveLobbyMsg.LobbyID, leaveLobbyMsg.UserID)
-
-		case broadcastInRoomType:
-			var broadcastInRoomMsg BroadcastInRoomMsg
-			err := json.Unmarshal(p, &broadcastInRoomMsg)
+		case updateTextType:
+			var updateTextMsg dto.UpdateTextMsg
+			err := json.Unmarshal(p, &updateTextMsg)
 
 			if err != nil {
 				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
 			}
-			fmt.Printf("broadcastMessage.text: %v\n", broadcastInRoomMsg.Text)
-			lwc.lobbyWsService.HandleNewText(broadcastInRoomMsg.LobbyID, broadcastInRoomMsg.UserID, broadcastInRoomMsg.Text)
-		}
+			lwc.lobbyWsService.UpdateText(updateTextMsg)
 
-		fmt.Printf("HERE IS THE MESSAGE \n")
+		case finishType:
+			var finishMsg dto.FinishMsg
+			err := json.Unmarshal(p, &finishMsg)
+
+			if err != nil {
+				conn.WriteMessage(websocket.TextMessage, []byte("Bad request"))
+			}
+			fmt.Printf("finishMsg: %v\n", finishMsg)
+			lwc.lobbyWsService.Finish(finishMsg)
+		}
 	}
 }
-
-// func (lwc LobbyWSController) handleBroadcast() {
-// 	for {
-// 		msg := <-lwc.broadcast
-// 		for clientID := range lwc.clients {
-// 			err := lwc.clients[clientID].WriteJSON(msg)
-// 			if err != nil {
-// 				fmt.Println(err)
-// 				lwc.clients[clientID].Close()
-// 				delete(lwc.clients, clientID)
-// 			}
-// 		}
-// 	}
-// }

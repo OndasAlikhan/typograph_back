@@ -69,7 +69,6 @@ func (lwr *LobbyWsRepository) BroadcastToRoom(roomId uint, messageType string) {
 			Data: lwr.rooms[roomId],
 		}
 		json, _ := json.Marshal(wsMsg)
-		// stringJson := string(json)
 		conn.WriteMessage(websocket.TextMessage, json)
 	}
 }
@@ -137,12 +136,11 @@ func (lwr *LobbyWsRepository) UserFinished(roomId uint, userId uint) error {
 		room.UsersDone[userId] = true
 	}
 	lwr.mut.RUnlock()
-	lwr.BroadcastToRoom(roomId, "update_users_done")
+	lwr.BroadcastToRoom(roomId, "finish")
 
 	return nil
 }
 
-// todo ChangeStatus
 func (lwr *LobbyWsRepository) ChangeStatus(roomId uint, status string) error {
 	lwr.mut.RLock()
 	if room, ok := lwr.rooms[roomId]; ok {

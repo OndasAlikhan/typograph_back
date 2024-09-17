@@ -20,11 +20,6 @@ type RegisterResponse struct {
 	Token string `json:"token"`
 }
 
-type Letter struct {
-	Char  string `json:"char"`
-	Color string `json:"color"`
-}
-
 func NewLoginResponse(token string) *LoginResponse {
 	return &LoginResponse{Token: token}
 }

@@ -13,12 +13,22 @@ type LobbyWsService struct {
 	repository *repository.LobbyWsRepository
 }
 
+type BroadcastMsg struct {
+	roomId uint
+	userId uint
+	text   [][]dto.Letter
+}
+
 func NewLobbyWsService(repo *repository.LobbyWsRepository) *LobbyWsService {
 	return &LobbyWsService{repository: repo}
 }
 
-func (lws *LobbyWsService) HandleNewText(roomId uint, userId uint, text [][]dto.Letter) {
-	lws.repository.SaveUserText(roomId, userId, text)
+func (lws *LobbyWsService) UpdateText(msg dto.UpdateTextMsg) {
+	lws.repository.SaveUserText(msg.LobbyID, msg.UserID, msg.Text)
+}
+
+func (lws *LobbyWsService) Finish(msg dto.FinishMsg) {
+	lws.repository.UserFinished(msg.LobbyID, msg.UserID)
 }
 
 func (lws *LobbyWsService) GetRoomInfo(roomId uint) dto.Room {
